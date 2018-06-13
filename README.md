@@ -230,3 +230,9 @@ int main(void)
 	return 0;//Your program should return 0 on normal termination.
 }
 *********************************************************************************************************************************
+prob4:
+Mr. Choi has to do a marathon of D distance. He can run at 5 different paces, each pace will have its time consumed per km and its energy consumption.
+Mr. Choi can only run till he had energy left.
+Find the minimum time required for choi to complete marathon if he has H energy.
+
+
