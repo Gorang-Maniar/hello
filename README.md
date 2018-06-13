@@ -51,3 +51,182 @@ int main(){     int t, n, i, j, k, coins, maxCoins;     cin >> t;     for (i = 0
    ********************************************************************************************************************     
         
         prob3:
+        
+        Four 5G base station towers needs to be installed in a  Landscape which is divided as hexagon cells as shown in Fig below, which also contains number of people living in each cell. Need to find four cells  to install the 5G towers which can cover maximum number of people  combining all four cells, with below conditions
+Only one tower can be placed in a cell
+Each of the four chosen cell should be neighbor to atleast one of the remaining 3 cells. 
+All four cells should be connected  (like  one island)
+
+Refer next slide for some valid combinations
+Input range:  1 <= N, M <= 15
+Sample input Format for Fig in right
+3 4
+150 450 100 320
+120 130 160 110
+10 60 200 220
+
+Output
+Square of  Maximum number of people covered by 4 towers
+
+
+#define _CRT_SECURE_NO_WARNINGS
+
+#include <stdio.h>
+
+#define MAX 16
+
+///////////// Method #1
+
+int N, M;
+int cells[MAX][MAX];
+int visited[MAX][MAX];
+int maxcount;
+
+int odir[2][6] = { { 0, 0, -1, 1, 1, 1 },
+					{ -1, 1, 0, 1, -1, 0 } };
+int edir[2][6] = { { -1, -1, -1, 0, 1, 0 },
+					{ -1, 1, 0, 1, 0, -1 } };
+
+
+int isvalid(int i, int j){
+	if (i < 0 || i >= N || j < 0 || j >= M)
+		return 0;
+	return 1;
+}
+int findmaxscore(int cX, int cY, int count, int curValue){
+
+	int i, nX, nY;
+	if (count == 4){
+		if (maxcount < curValue){
+			maxcount = curValue;
+		}
+		return;
+	}
+
+	for (i = 0; i < 6; i++){
+		if (cY % 2 == 0){
+			nX = cX + edir[0][i];
+			nY = cY + edir[1][i];
+		}
+		else{
+			nX = cX + odir[0][i];
+			nY = cY + odir[1][i];
+		}
+
+		if (isvalid(nX, nY) && visited[nX][nY] == 0){
+			visited[nX][nY] = 1;
+			findmaxscore(cX, cY, count + 1, curValue + cells[nX][nY]);
+			findmaxscore(nX, nY, count + 1, curValue + cells[nX][nY]);
+			visited[nX][nY] = 0;
+		}
+	}
+}
+
+///////////// Method #2
+
+int Hcells[MAX * 2][MAX];
+int visit2[MAX * 2][MAX];
+int gmaxcore;
+
+int dir[2][6] = { { -1, 1, 2, 1, -1, -2 },
+					{ 1, 1, 0, -1, -1, 0 } };
+
+int issafe(int i, int j){
+	if (i < 0 || i >= N * 2 || j < 0 || j >= M)
+		return 0;
+	return 1;
+}
+int findmax2(int cX, int cY, int count, int curValue){
+
+	int i, nX, nY;
+	if (count == 4){
+		if (gmaxcore < curValue){
+			gmaxcore = curValue;
+		}
+		return;
+	}
+
+	for (i = 0; i < 6; i++){
+		nX = cX + dir[0][i];
+		nY = cY + dir[1][i];
+
+		if (issafe(nX, nY) && visit2[nX][nY] == 0){
+			visit2[nX][nY] = 1;
+			findmax2(cX, cY, count + 1, curValue + Hcells[nX][nY]);
+			findmax2(nX, nY, count + 1, curValue + Hcells[nX][nY]);
+			visit2[nX][nY] = 0;
+		}
+	}
+}
+
+
+
+int main(void)
+{
+	int T, test_case;
+
+	freopen("input.txt", "r", stdin);
+
+	setbuf(stdout, NULL);
+	scanf("%d", &T);
+
+	for (test_case = 0; test_case < T; test_case++)
+	{
+
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		/*
+		Implement your algorithm here.
+		The answer to the case will be stored in variable Answer.
+		*/
+		/////////////////////////////////////////////////////////////////////////////////////////////
+
+		int i, j, k, l;
+		scanf("%d %d", &N, &M);
+
+		for (i = 0; i < N; i++){
+			for (j = 0; j < M; j++){
+				scanf("%d", &cells[i][j]);
+			}
+		}
+
+		maxcount = 0;
+		for (i = 0; i < N; i++){
+			for (j = 0; j < M; j++){
+				visited[i][j] = 1;
+				findmaxscore(i, j, 1, cells[i][j]);
+				visited[i][j] = 0;
+			}
+		}
+
+		//////////// Method 2  ////////////
+
+		int x, y;
+		for (i = 0, x = 0; i < N; i++, x += 2){
+			for (j = 0; j < M; j++){
+				if (j % 2 == 0)
+					Hcells[x][j] = cells[i][j];
+				else
+					Hcells[x + 1][j] = cells[i][j];
+			}
+		}
+
+		gmaxcore = 0;
+		for (i = 0; i < N * 2; i++){
+			for (j = 0; j < M; j++){
+				if (Hcells[i][j] != 0){
+					visit2[i][j] = 1;
+					findmax2(i, j, 1, Hcells[i][j]);
+					visit2[i][j] = 0;
+				}
+			}
+		}
+
+		// Print the answer to standard output(screen).
+		printf("%d\n", maxcount*maxcount);
+		printf("%d\n", gmaxcore*gmaxcore);
+
+	}
+
+	return 0;//Your program should return 0 on normal termination.
+}
+*********************************************************************************************************************************
