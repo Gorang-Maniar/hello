@@ -588,3 +588,86 @@ int main(){
 
 //   "\n"
 
+*************************************************************************************************************************************
+previous question:
+#include<bits/stdc++.h>
+using namespace std;
+
+int log(long long int n)
+{
+	int ct=0;
+	while(n>1)
+	{
+		n = n/2;
+		ct++;	
+	}
+	return ct;
+}
+
+long long int find(long long int a,long long int b,long long int c,long long int num, long long int mid,long long int min, long long int max)
+{
+	int lg = log(mid);
+	long long int fn =a+(b*lg)+(c*mid*mid);
+
+//	cout<<"mid="<<mid<<" "<<"fn="<<fn<<endl;
+	long long int rem = num%mid;
+	//temp = temp - (a*mid) - (b*lg*mid);
+	//long long int quo = num/mid;
+	//cout<<"temp="<<temp<<endl;
+	
+	if(mid*mid<mid)
+	{
+		max = mid;
+		mid = (min/2)+(max/2);
+		find(a,b,c,num,mid,min,max);
+	}
+
+	else if(rem!=0 && (num/fn)>mid)
+	{
+		min = mid;
+		//	cout<<"min="<<min<<" "<<"max="<<max<<endl;	
+		mid = (min/2)+(max/2);
+		//	cout<<"updated_mid="<<mid<<" ";
+		find(a,b,c,num,mid,min,max);
+	}
+	else if(rem!=0 && (num/fn)<mid)
+	{
+		max = mid;
+		mid = (min/2)+(max/2);
+		find(a,b,c,num,mid,min,max);
+	}
+	else if(rem==0 && (num/fn)==mid)
+	{
+			return mid;
+	}
+	else
+		return -1;
+
+
+
+}
+
+int main()
+{
+	
+	for(int i=0;i<10;i++)
+	{
+		long long int a,b,c,num;
+		cin>>a>>b>>c>>num;
+
+		
+		long long int min =0, max = INT_MAX;
+		max=max-1;
+		long long int mid = (min+max)/2,ans=0;
+		// cout<<"num="<<num<<endl;
+		ans = find(a,b,c,num,mid,min,max);
+		if(ans<0)
+			cout<<"#"<<i+1<<" "<<ans+1<<endl;
+		else
+			cout<<"#"<<i+1<<" "<<ans<<endl;
+	}
+	return 0;
+}
+
+
+
