@@ -671,3 +671,114 @@ int main()
 
 
 
+***********************************************************************************************************************
+fishery problem
+#include <iostream>
+
+using namespace std;
+
+int n; // It was less than 60 i think
+int gates[3] = {0, 1, 2}; // Stores gates permutation
+int fishermen[61]; // Stores if particular position is already taken by a fisherman or not.
+int min_ans = 1000000; // Answer
+int gate_info[3][2]; // Stores gate wise position and number of fishermen standing in fron of it.
+
+int get_min(int a, int b) {
+	return (a < b)?a:b;
+}
+
+void min_walk(int index, int walk_till_now, int fishermen[]) {
+	if(index >= 3) {
+		//cout << walk_till_now << " ";
+		min_ans = get_min(min_ans, walk_till_now);
+		return;
+	}
+
+	int pos = gate_info[gates[index]][0];
+	int ppl = gate_info[gates[index]][1];
+	//cout << "Position: " << pos << " | Peoples: " << ppl << endl;
+
+	// Fill the first position directly. There after people can go in pair if possible.
+	if(fishermen[pos] != 1){
+		fishermen[pos] = 1;
+		walk_till_now += 1;
+		ppl--;
+	}
+
+	// j is like radius increasing by one every iteration.
+	for(int i = ppl, j = 1; i > 0; j++) {
+		// Take care of the case when just one fisherman is left and he can go to either left or right position.
+		if(i == 1 && pos - j >= 0 && fishermen[pos - j] != 1 && pos + j < n && fishermen[pos + j] != 1) {
+			// Try left position and find its minimum walk.
+			int temp[61];
+			for(int q = 0; q<61; q++)
+				temp[q] = fishermen[q];
+			fishermen[pos - j] = 1;
+			min_walk(index + 1, walk_till_now + j + 1, fishermen);
+
+			// Backtrack 
+			for(int q = 0; q<61; q++)
+				fishermen[q] = temp[q];
+			
+			// Try right position and find its minimum walk.
+			fishermen[pos + j] = 1;
+			min_walk(index + 1, walk_till_now + j + 1, fishermen);
+			i--;
+			return;
+		}
+
+		// To check if the left position is empty or not. If it is fill it.
+		if(pos-j >= 0 && fishermen[pos - j] != 1) {
+			fishermen[pos - j] = 1;
+			walk_till_now = walk_till_now + j + 1;
+			i--;
+		}
+
+		// To check if the right position is empty or not. If it is fill it.
+		if(pos+j < n && fishermen[pos + j] != 1) {
+			fishermen[pos + j] = 1;
+			walk_till_now = walk_till_now + j + 1;
+			i--;
+		}
+	}
+	// If there was no choice, proceed without any problem.
+	min_walk(index + 1, walk_till_now, fishermen);
+}
+
+void swap(int i, int j) {
+	int temp = gates[i];
+	gates[i] = gates[j];
+	gates[j] = temp;
+}
+
+// Function to find permutation of any m( = 3 here) sized array.
+// Otherwise simply give following 6 known possible permutations: {{0, 1, 2}, {0, 2, 1}, {1, 0, 2}, {1, 2, 0}, {2, 1, 0}, {2, 0, 1}} 
+void getPerms(int index) {
+	if(index >= 3){
+		//cout << gates[0] << " " << gates[1] << " " << gates[2] << endl;
+		for(int i = 0; i<61; i++)
+			fishermen[i] = 0;
+		min_walk(0, 0, fishermen);
+		return;
+	}
+	for(int j = index; j < 3; j++) {
+		swap(index, j); // Swap i with j
+		getPerms(index+1);
+		swap(index, j); // Backtrack
+	}
+}
+
+int main() {
+	int testcases;
+	cin >> testcases;
+	for(int testcase = 0; testcase < testcases; testcase++) {
+		cin >> n;		
+		for(int i = 0; i < 3; i++) {
+			cin >> gate_info[i][0] >> gate_info[i][1];
+			gate_info[i][0]--; // Position is 1-indexed, make it 0
+		}
+		min_ans = 1000000;
+		getPerms(0);
+		cout << "Min walk: " << min_ans << endl;
+	}
+}
