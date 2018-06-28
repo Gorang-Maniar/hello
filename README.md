@@ -782,3 +782,26 @@ int main() {
 		cout << "Min walk: " << min_ans << endl;
 	}
 }
+
+
+**********************************************************************************************************************
+shooting ballon
+int getmaxpoint(int l,int r,int n)
+{
+  int maxscore=0;
+  for(int i=l+1;i<r;i++)
+  {
+    int current_sum=0;
+    current_sum=getmaxpoint(l,i,n)+getmaxpoint(i,r,n);
+    if(l==0 && r==n+1)
+    current_sum=current_sum+balloon[i];
+    else
+    current_sum=current_sum+balloon[l]*balloon[r];
+    
+    if(current_sum>maxscore)
+    maxscore=current_sum;
+  }
+  return maxscore;
+}
+
+
